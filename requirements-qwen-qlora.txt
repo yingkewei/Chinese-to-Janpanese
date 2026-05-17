@@ -1,0 +1,10 @@
+# Qwen2.5-7B QLoRA SFT (install inside cnjp-py310 after base torch is OK)
+torch>=2.1.0
+transformers>=4.43.0
+datasets>=2.14.0
+accelerate>=0.34.0
+peft>=0.11.0
+bitsandbytes>=0.43.0
+trl>=0.9.0
+sacrebleu>=2.4.0
+matplotlib>=3.7.0

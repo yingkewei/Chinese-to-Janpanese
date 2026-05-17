@@ -1,0 +1,7 @@
+{
+  "corpus_bleu_char": 19.763630670798687,
+  "n_lines": 98126,
+  "eval_raw_tsv": "/mnt/chenyonglin2/Chinese_to_Japanese/dataset_processed/eval/cff79186692165b02d3b94d650c11d55.raw.tsv",
+  "checkpoint": "/mnt/chenyonglin2/Chinese_to_Japanese/translation/checkpoints/last.pt",
+  "decode_seconds": 3894.486
+}

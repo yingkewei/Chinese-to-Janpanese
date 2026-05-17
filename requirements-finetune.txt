@@ -1,0 +1,10 @@
+# NLLB / HF fine-tuning (use after base torch install)
+torch>=2.0.0
+transformers>=4.40.0
+datasets>=2.14.0
+accelerate>=0.34.0
+evaluate>=0.4.0
+sacrebleu>=2.4.0
+sentencepiece>=0.1.99
+matplotlib>=3.5.0
+matplotlib>=3.7.0
