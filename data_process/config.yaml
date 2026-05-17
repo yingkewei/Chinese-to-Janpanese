@@ -1,0 +1,107 @@
+input:
+  # Keep this as raw source file path.
+  raw_file: dataset/train/zh-ja/zh-ja.crowdsourcing_b05l07.txt
+  delimiter: "\t"
+  # Set integer for quick debug (e.g. 50000), or null for full data.
+  max_pairs: null
+  # Progress log: print time per N raw pairs read.
+  progress_every: 100000
+
+output:
+  base_dir: data_processing/output
+  train_file: train.filtered.tsv
+  dev_file: dev.filtered.tsv
+  test_file: test.filtered.tsv
+  metrics_file: metrics.json
+
+# SentencePiece totals + length distribution for train/dev/test (see metrics corpus_stats).
+corpus_stats:
+  spm_model: dataset_processed/spm/mixed_zh_ja.model
+  encode_batch_size: 8192
+
+split:
+  dev_ratio: 0.02
+  test_ratio: 0.02
+  seed: 42
+
+stage1_basic_clean:
+  min_char: 2
+  max_char: 500
+  max_url_ratio: 0.4
+  # If true, drop pairs containing any URL token (http/https/www).
+  drop_if_any_url: true
+  drop_if_same_text: true
+  drop_if_html: true
+  drop_if_email: true
+  drop_if_js_css: true
+  # Ratio of "garbage" unicode chars (control/unassigned/private-use/surrogate/�) over non-space chars.
+  # Set null to disable.
+  max_weird_char_ratio: 0.02
+  # Drop if any character repeats >= N times consecutively. Set 0 to disable.
+  max_repeated_char_run: 6
+
+stage2_language_normalize:
+  require_zh_cjk_ratio: 0.15
+  require_ja_jp_ratio: 0.10
+  use_nfkc: true
+  collapse_spaces: true
+  # Optional Chinese conversion via OpenCC:
+  # - "" (empty) disables
+  # - common configs: "t2s", "s2t", "t2tw", "tw2s", ...
+  # Requires: pip install opencc-python-reimplemented
+  zh_opencc: ""
+  # Optional Japanese kana script unification:
+  # - none: keep as-is
+  # - kata_to_hira: convert Katakana to Hiragana
+  # - hira_to_kata: convert Hiragana to Katakana
+  ja_kana_normalize: "none"
+
+stage3_length_alignment:
+  min_len: 5
+  max_len: 200
+  min_ratio: 0.5
+  max_ratio: 2.0
+  enforce_number_consistency: true
+  # Punctuation consistency between zh/ja:
+  # If enabled, drop pairs whose punctuation counts differ too much.
+  enforce_punctuation_consistency: true
+  punct_mismatch_max: 6
+
+stage4_semantic:
+  enabled: true
+  # Quality-first default: multilingual-e5-large.
+  # Speed fallback: intfloat/multilingual-e5-base
+  # Alternative: sentence-transformers/LaBSE
+  model_name: intfloat/multilingual-e5-large
+  # e5 => adds "query:" / "passage:" prefix; labse => plain text.
+  model_style: e5
+  # auto => use cuda if available, else cpu.
+  device: auto
+  # Set true when model is already downloaded or model_name is a local path.
+  local_files_only: false
+  trust_remote_code: false
+  # Use two GPUs for embedding encoding (Stage 4).
+  use_multi_gpu: true
+  gpu_ids: [0, 1]
+  batch_size: 8192
+  # Progress log: print time per N pairs scored in Stage 4.
+  progress_every: 10000
+  normalize_embeddings: true
+  # Tiered thresholds:
+  # score >= high_threshold: keep directly
+  # low_threshold <= score < high_threshold: extra checks, then keep
+  # score < low_threshold: drop
+  high_threshold: 0.85
+  low_threshold: 0.75
+  mid_min_char: 8
+  mid_require_number_match: true
+  mid_max_len_ratio_delta: 0.65
+  mid_punct_mismatch_max: 6
+
+stage5_dedup_reweight:
+  enabled: true
+  dedup_exact: true
+  dedup_near_by_normalized_key: true
+  default_weight: 1.0
+  short_sentence_penalty_threshold: 6
+  short_sentence_weight: 0.8

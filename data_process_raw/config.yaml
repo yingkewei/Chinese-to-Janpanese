@@ -1,0 +1,22 @@
+# Raw baseline: read the same source file as the main pipeline, no cleaning stages, same split.
+input:
+  raw_file: dataset/train/zh-ja/zh-ja.crowdsourcing_b05l07.txt
+  delimiter: "\t"
+  max_pairs: null
+  progress_every: 100000
+
+output:
+  base_dir: data_processing_raw/output
+  train_file: train.raw.tsv
+  dev_file: dev.raw.tsv
+  test_file: test.raw.tsv
+  metrics_file: metrics.json
+
+corpus_stats:
+  spm_model: dataset_processed/spm/mixed_zh_ja.model
+  encode_batch_size: 8192
+
+split:
+  dev_ratio: 0.02
+  test_ratio: 0.02
+  seed: 42
