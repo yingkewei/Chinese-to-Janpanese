@@ -42,7 +42,7 @@ pip install sentence-transformers pyyaml
 - 默认原始平行语料路径由 `data_processing/config.yaml` 中 `input.raw_file` 指定，当前为：
   `dataset/train/zh-ja/zh-ja.crowdsourcing_b05l07.txt`（制表符分隔 zh / ja）。
 - 评测集若存在 `dataset/test/*.xlsx`，会在下一步被对齐到 `dataset_processed/eval/`；没有 xlsx 时仅跳过评测导出，不影响训练。
-
+  (注意，由于训练所用数据太大，这里就不放置了http://www.kecl.ntt.co.jp/icl/lirg/jparacrawl/，大家可以在该链接去下载训练数据)
 ---
 
 ## 3. 跑通主流程：清洗 → SPM → 自研 Transformer → 评测
